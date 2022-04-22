@@ -1,25 +1,37 @@
 import React, { useState, useEffect } from "react";
-const url = "https://api.github.com/users/Aryan-goel";
+const url = "https://api.github.com/users/";
 const MultipleReturns = () => {
-  const [isLoading, setisLoading] = useState(false);
+  const [isLoading, setisLoading] = useState(true);
   const [isError, setisError] = useState(false);
   const [user, setUser] = useState("default user");
 
   useEffect(() => {
     fetch(url)
-      .then((response) => response.json())
-      .then((user) => console.log(user))
+      .then((response) => {
+        if (response.status >= 200 && response.status <= 299) {
+          return response.json();
+        } else {
+          setisLoading(false);
+          setisError(true);
+          throw new Error(response.statusText);
+        }
+      })
+      .then((user) => {
+        const { login } = user;
+        setUser(login);
+        setisLoading(false);
+      })
       .catch((error) => console.log(error));
   }, []);
 
-  if (isLoading === true) {
+  if (isLoading) {
     return (
       <div>
         <h1>loading...</h1>
       </div>
     );
   }
-  if (isError === true) {
+  if (isError) {
     return (
       <div>
         <h1>error...</h1>
